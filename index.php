@@ -1,15 +1,16 @@
 <?php
-
+set_time_limit(-1);
 
 require 'phpQuery/phpQuery.php';
 require 'helper_functions.php';
 	
 const SITE = 'http://carnomer.ru';	
 
-
 parse(SITE);
 
 function parse($url){
+
+	echo $url . '<br>';
 	$doc = file_get_contents($url);
 	$doc = phpQuery::newDocument($doc);
 	$elements = pq('#page-content-wrap tr.js-link');
@@ -20,18 +21,16 @@ function parse($url){
 		$phone = getPhone(pq('.td-seller a', $elem)->attr('data-id'));
 		$city = pq('.td-region', $elem)->text();
 		$data = array_map('trim',compact('number','price','name','phone','city'));
-		x($data);
+		saveData($data);
 	}
 	
 	
-	// saveData($data);
 	
 	
 	$next = pq('.pagination .next a')->attr('href');
 	$doc->unloadDocument();
 	if($next){
-		echo $next . '<br>';
-		// parse(SITE . $next);
+		parse(SITE . $next);
 	}
 }
 
@@ -66,4 +65,14 @@ function getPhone($id){
 	
 	return $phone;
 	
+}
+
+function saveData($data){
+	
+	$fd = fopen('data.csv', 'w+');
+	
+	fputcsv($fd, $data, ';');
+	
+	fclose($fd);
+		
 }
