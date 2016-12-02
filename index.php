@@ -5,12 +5,16 @@ require 'phpQuery/phpQuery.php';
 require 'helper_functions.php';
 	
 const SITE = 'http://carnomer.ru';	
-
+file_put_contents('data.csv', '');
+touch('checker.dd');
 parse(SITE);
 
 function parse($url){
-
-	echo $url . '<br>';
+	if(!file_exists('checker.dd')){
+		s('вызвана остановка',1);
+		exit;
+	}
+	s($url);
 	$doc = file_get_contents($url);
 	$doc = phpQuery::newDocument($doc);
 	$elements = pq('#page-content-wrap tr.js-link');
@@ -23,15 +27,15 @@ function parse($url){
 		$data = array_map('trim',compact('number','price','name','phone','city'));
 		saveData($data);
 	}
-	
-	
-	
-	
-	$next = pq('.pagination .next a')->attr('href');
+
+	$next = pq('.pagination .next a', $doc)->attr('href');
 	$doc->unloadDocument();
 	if($next){
-		parse(SITE . $next);
+	parse(SITE . $next);
 	}
+	
+	
+	
 }
 
 
@@ -69,8 +73,10 @@ function getPhone($id){
 
 function saveData($data){
 	
-	$fd = fopen('data.csv', 'w+');
-	
+	$fd = fopen('data.csv', 'a+');
+	$data = array_map(function($i){
+		return iconv('utf-8','cp1251',$i);
+	}, $data);
 	fputcsv($fd, $data, ';');
 	
 	fclose($fd);
