@@ -41,7 +41,8 @@ function parse($url){
 function getNum($text){
 	
 	$num = preg_replace('~Продажа номера (.+) \(.*~','$1',$text);
-	echo $num;
+	
+	$num;
 	
 	return $num;
 }
@@ -53,9 +54,15 @@ function getPhone($id){
 			'header'=>"X-Requested-With: XMLHttpRequest\n",
 		],
 	]);
-	$card = file_get_contents(SITE . '/ajax/get-user-info?user_id=' . $id,null,$context);
-	j($card);
-	$phone = '';
+	$card = file_get_contents(SITE . '/ajax/get-user-info?user_id=' . $id, null, $context);
+	
+	$doc = phpQuery::newDocument($card);
+	$id = pq('.get-phone')->attr('data-id');
+	$doc->unloadDocument();
+	
+	$phone = file_get_contents(SITE . '/ajax/get-phone?user_id=' . $id, null, $context);
+	
+	$phone = strip_tags($phone);
 	
 	return $phone;
 	

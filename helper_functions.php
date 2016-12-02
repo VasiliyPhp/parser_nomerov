@@ -10,6 +10,8 @@ if(!function_exists('x')){
 			$ar = $ar[0];
 		}
 		printf('<pre>%s</pre>', print_r($ar, 1));
+		ob_flush();
+		flush();
 	}
 }
 
