@@ -3,10 +3,13 @@ set_time_limit(-1);
 
 require 'phpQuery/phpQuery.php';
 require 'helper_functions.php';
-	
+
 const SITE = 'http://carnomer.ru';	
-file_put_contents('data.csv', '');
 touch('checker.dd');
+
+file_put_contents('data.csv', '');
+// parse(SITE  . '?page=137');
+
 parse(SITE);
 
 function parse($url){
@@ -20,7 +23,10 @@ function parse($url){
 	$elements = pq('#page-content-wrap tr.js-link');
 	foreach($elements as $elem){
 		$number = getNum(pq('td:eq(0) img', $elem)->attr('alt'));
-		$price = pq('.td-price .f_price', $elem)->text() . pq('.td-price .f_price2', $elem)->text() ;//. pq('.td-price .grz-hint', $elem)->text();
+		$price = pq('.td-price .f_price', $elem)->text() 
+			   . pq('.td-price .f_price2:eq(0)', $elem)->text()
+			   . pq('.td-price .f_price2:eq(1)', $elem)->text() ;
+			   //. pq('.td-price .grz-hint', $elem)->text();
 		$name = pq('.td-seller a', $elem)->text();
 		$phone = getPhone(pq('.td-seller a', $elem)->attr('data-id'));
 		$city = pq('.td-region', $elem)->text();
